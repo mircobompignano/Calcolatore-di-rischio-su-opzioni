@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GM Options Calculator</title>
+    <style>
+        :root {
+            --bg-color: #030712;
+            --card-bg: #111827;
+            --card-border: #1f2937;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --accent-bg: #1e3a8a;
+            --accent-text: #93c5fd;
+            --input-bg: #1f2937;
+            --input-border: #374151;
+            --input-focus: #3b82f6;
+            --result-bg: #1f2937;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 14px;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.025em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section {
+            background-color: var(--bg-color);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        input {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            color: var(--text-main);
+            padding: 12px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--input-focus);
+        }
+
+        .result-box {
+            background-color: var(--accent-bg);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: var(--accent-text);
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .section-note {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-style: italic;
+            line-height: 1.3;
+        }
+
+        .btn-reset {
+            width: 100%;
+            background-color: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 16px;
+        }
+
+        .btn-reset:hover {
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            border-color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Calcolatore di rischio sulle opzioni</h1>
+        </header>
+
+        <button class="btn-reset" onclick="resetForm()">Azzera Campi</button>
+
+        <!-- SEZIONE 1 -->
+        <div class="section">
+            <div class="section-title">1. Ampiezza SL sul Sottostante</div>
+            <div class="input-group">
+                <label>Livello di Entry</label>
+              <input type="number" id="entrySottostante" step="any" placeholder="Es. 732.4" oninput="calculate()">
+            </div>
+            <div class="input-group" style="margin-top: 10px;">
+                <label>Stop Loss</label>
+              <input type="number" id="stopLossSottostante" step="any" placeholder="Es. 731.8" oninput="calculate()">
+            </div>
+            <div class="result-box">
+                <span class="result-label">Ampiezza SL1</span>
+                <span class="result-value" id="resAmpiezzaSL1">0.00</span>
+            </div>
+            <div class="section-note">
+                Valore ottimale: compreso tra l'ATR e la sua metà.
+            </div>
+        </div>
+
+        <!-- SEZIONE 2 -->
+        <div class="section">
+            <div class="section-title">2. Ampiezza SL sull'Opzione</div>
+          <div class="input-group">
+                <label>Delta dell'Opzione (es. 0.450)</label>
+                <input type="number" id="deltaOpzione" step="any" placeholder="Es. 0.450" oninput="calculate()">
+            </div>
+            <div class="result-box">
+                <span class="result-label">Ampiezza SL2 (SL1 x Delta)</span>
+                <span class="result-value" id="resAmpiezzaSL2">0.00</span>
+            </div>
+        </div>
+
+        <!-- SEZIONE 3 -->
+        <div class="section">
+            <div class="section-title">3. Numero di Contratti</div>
+            <div class="input-group">
+                <label>Size (es. 200$)</label>
+                <input type="number" id="sizeCapitale" step="any" placeholder="Es. 200" oninput="calculate()">
+            </div>
+            <div class="result-box">
+                <span class="result-label">Contratti da acquistare</span>
+                <span class="result-value" id="resContratti">0</span>
+            </div>
+        </div>
+
+        <!-- SEZIONE 4 -->
+        <div class="section">
+            <div class="section-title">4. Livello SL Opzione</div>
+            <div class="input-group">
+                <label>Prezzo di Entry Opzione</label>
+              <input type="number" id="entryOpzione" step="any" placeholder="Es. 0.90" oninput="calculate()">
+            </div>
+            <div class="result-box">
+                <span class="result-label">Livello Stop Loss Opzione</span>
+                <span class="result-value" id="resLivelloSLOpzione">0.00</span>
+            </div>
+        </div>
+
+        <button class="btn-reset" style="margin-bottom: 0;" onclick="resetForm()">Azzera Campi</button>
+</div>
+
+    <script>
+        function parseVal(id) {
+            const val = parseFloat(document.getElementById(id).value);
+            return isNaN(val) ? 0 : val;
+        }
+
+        function calculate() {
+            // Sezione 1: Ampiezza SL 1
+            const entrySott = parseVal('entrySottostante');
+            const slSott = parseVal('stopLossSottostante');
+            const ampiezzaSL1 = Math.abs(entrySott - slSott);
+            document.getElementById('resAmpiezzaSL1').innerText = ampiezzaSL1.toFixed(2);
+
+            // Sezione 2: Ampiezza SL 2
+            const delta = parseVal('deltaOpzione');
+            const ampiezzaSL2 = ampiezzaSL1 * delta;
+            document.getElementById('resAmpiezzaSL2').innerText = ampiezzaSL2.toFixed(2);
+
+            // Sezione 3: Numero Contratti
+            const size = parseVal('sizeCapitale');
+            let numContratti = 0;
+            if ((ampiezzaSL2 * 100) > 0) {
+                numContratti = size / (ampiezzaSL2 * 100);
+            }
+            document.getElementById('resContratti').innerText = numContratti > 0 ? `${numContratti.toFixed(2)} (≈ ${Math.round(numContratti)})` : '0';
+
+            // Sezione 4: Livello SL Opzione
+            const entryOpz = parseVal('entryOpzione');
+            const livelloSLOpzione = entryOpz - ampiezzaSL2;
+            document.getElementById('resLivelloSLOpzione').innerText = livelloSLOpzione > 0 ? livelloSLOpzione.toFixed(2) : '0.00';
+        }
+
+        function resetForm() {
+            document.querySelectorAll('input').forEach(input => input.value = '');
+            calculate();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
